@@ -1,0 +1,31 @@
+body, html { margin: 0; padding: 0; height: 100%; }
+
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.mapboxgl-popup {
+    font-family: 'Arial', sans-serif; /* You can change the font-family as per your design preference */
+    font-size: 1.1em;
+}
+
+.mapboxgl-popup-content {
+    color: #000; /* Black text color for the content */
+    background-color: #fff; /* White background for the popup */
+    border-color: #a50f15; /* Accent color for the border */
+    border-width: 2px;
+    padding: 10px;
+    border-radius: 5px; /* Optional: Adds rounded corners to the popup */
+}
+
+.mapboxgl-popup-close-button {
+    color: #a50f15; /* Accent color for the close button */
+}
+
+.mapboxgl-popup-tip {
+    border-top-color: #fff; /* Ensures the tip arrow matches the popup background */
+}
