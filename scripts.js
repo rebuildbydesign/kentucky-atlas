@@ -4,7 +4,7 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11', // Use a Mapbox base style
     center: [-85.7682, 37.8393], // Centered on Kentucky
-    zoom: 7
+    zoom: 6.8
 });
 
 map.on('load', function () {
