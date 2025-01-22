@@ -1,8 +1,8 @@
-mapboxgl.accessToken = 'pk.eyJ1IjoiajAwYnkiLCJhIjoiY2x1bHUzbXZnMGhuczJxcG83YXY4czJ3ayJ9.S5PZpU9VDwLMjoX_0x5FDQ'; // Your Mapbox access token
+mapboxgl.accessToken = 'pk.eyJ1IjoiajAwYnkiLCJhIjoiY2x1bHUzbXZnMGhuczJxcG83YXY4czJ3ayJ9.S5PZpU9VDwLMjoX_0x5FDQ'; // Your Mapbox access token 
 
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/j00by/cm689ppsp00jt01s7ddjd69b6', // Use a Mapbox base style
+    style: 'mapbox://styles/mapbox/light-v11', // Use a Mapbox base style
     center: [-85.7682, 37.8393], // Centered on Kentucky
     zoom: 6.5
 });
@@ -138,11 +138,11 @@ function consolidateFeatureData(features) {
                 break;
             case 'houseDistricts':
                 featureData.houseDist = feature.properties.District;
-                featureData.houseRepName = feature.properties.Legislator;
+                featureData.houseRepName = feature.properties.Full_Name;
                 break;
             case 'senateDistricts':
                 featureData.senateDist = feature.properties.District;
-                featureData.senateRepName = feature.properties.Legislator;
+                featureData.senateRepName = feature.properties.Full_Name;
                 break;
         }
     });
