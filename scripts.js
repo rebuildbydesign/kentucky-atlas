@@ -4,7 +4,7 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11', // Use a Mapbox base style
     center: [-85.7682, 37.8393], // Centered on Kentucky
-    zoom: 6.5
+    zoom: 6.8
 });
 
 map.on('load', function () {
@@ -164,7 +164,7 @@ function createPopupContent(featureData) {
     <strong>Congress:</strong> ${featureData.congressRepName || 'N/A'} (${featureData.congressionalDist || 'N/A'})<br>
     <strong>House of Representative:</strong> ${featureData.houseRepName || 'N/A'} (${featureData.houseDist || 'N/A'})<br>
     <strong>Senate:</strong> ${featureData.senateRepName || 'N/A'} (${featureData.senateDist || 'N/A'})
-    <p style="color: gray; font-style: italic; font-size: 0.9em;">* <a href="https://rebuildbydesign.org/atlas-of-accountability/" target="_blank" style="color: gray;">Atlas of Accountability (2011-2023) by Rebuild by Design</a></p>
+    <p style="color: gray; font-style: italic; font-size: 0.9em;">* <a href="https://rebuildbydesign.org/atlas-of-accountability/" target="_blank" style="color: gray;">Atlas of Accountability (2011-2024) by Rebuild by Design</a></p>
 
 </div>
 
