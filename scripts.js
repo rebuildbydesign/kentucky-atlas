@@ -4,7 +4,7 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11', // Use a Mapbox base style
     center: [-85.7682, 37.8393], // Centered on Kentucky
-    zoom: 6.8
+    zoom: 6.5
 });
 
 map.on('load', function () {
@@ -26,13 +26,13 @@ function addLayers() {
         'paint': {
             'fill-color': [
                 'match',
-                ['to-number', ['get', 'COUNTY_DIS'], 0],
+                ['to-number', ['get', 'COUNTY_DISASTER_COUNT'], 0],
                 0, '#ffffff', 1, '#fee5d9', 2, '#fee5d9',
                 3, '#fcae91', 4, '#fcae91', 5, '#fb6a4a',
                 6, '#fb6a4a', 7, '#de2d26', 8, '#de2d26',
                 9, '#de2d26', 10, '#a50f15', 11, '#a50f15',
                 12, '#a50f15', 13, '#a50f15', 14, '#a50f15',
-                15, '#a50f15', '#ffffff'
+                15, '#a50f15', 16, '#a50f15', '#ffffff'
             ],
             'fill-opacity': 1
         }
@@ -127,10 +127,11 @@ function consolidateFeatureData(features) {
         switch (feature.layer.id) {
             case 'femaDisasters':
                 featureData.countyName = feature.properties.NAME;
-                featureData.disasters = feature.properties.COUNTY_DIS;
-                featureData.femaObligations = feature.properties.COUNTY_FEM;
-                featureData.countyPopulation = feature.properties.COUNTY_POP;
-                featureData.countyPerCapita = feature.properties.COUNTY_PER;
+                featureData.disasters = feature.properties.COUNTY_DISASTER_COUNT;
+                featureData.femaObligations = feature.properties.COUNTY_TOTAL_FEMA;
+                featureData.countyPopulation = feature.properties.COUNTY_POPULATION;
+                featureData.countyPerCapita = feature.properties.COUNTY_PER_CAPITA;
+                featureData.countySVI = feature.properties.SVI_2022;
                 break;
             case 'congressionalDistricts':
                 featureData.congressionalDist = feature.properties.OFFICE_ID;
@@ -157,7 +158,8 @@ function createPopupContent(featureData) {
     <strong>Federal Disaster Declarations:</strong> ${featureData.disasters || 'N/A'}<br>
     <strong>FEMA Obligations (PA+HM):</strong> ${featureData.femaObligations ? `${parseFloat(featureData.femaObligations).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}` : 'N/A'}<br>
     <strong>County Population:</strong> ${featureData.countyPopulation ? parseInt(featureData.countyPopulation).toLocaleString('en-US') : 'N/A'}<br>
-    <strong>County Per Capita:</strong> ${featureData.countyPerCapita ? `${parseFloat(featureData.countyPerCapita).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}` : 'N/A'}
+    <strong>County Per Capita:</strong> ${featureData.countyPerCapita ? `${parseFloat(featureData.countyPerCapita).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}` : 'N/A'}<br>
+    <strong>SVI Score:</strong> ${featureData.countySVI  || 'N/A'}
     <h2 style="color: #a50f15;">Legislative Members</h2>
     <strong>Congress:</strong> ${featureData.congressRepName || 'N/A'} (${featureData.congressionalDist || 'N/A'})<br>
     <strong>House of Representative:</strong> ${featureData.houseRepName || 'N/A'} (${featureData.houseDist || 'N/A'})<br>
