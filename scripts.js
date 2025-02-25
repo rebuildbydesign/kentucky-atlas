@@ -126,7 +126,7 @@ function consolidateFeatureData(features) {
     features.forEach(function(feature) {
         switch (feature.layer.id) {
             case 'femaDisasters':
-                featureData.countyName = feature.properties.NAME;
+                featureData.countyName = feature.properties.NAMELSAD;
                 featureData.disasters = feature.properties.COUNTY_DISASTER_COUNT;
                 featureData.femaObligations = feature.properties.COUNTY_TOTAL_FEMA;
                 featureData.countyPopulation = feature.properties.COUNTY_POPULATION;
