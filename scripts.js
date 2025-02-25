@@ -154,7 +154,7 @@ function consolidateFeatureData(features) {
 function createPopupContent(featureData) {
     return `
        <div style="color: #000;">
-    <h2 style="color: #a50f15;">${featureData.countyName} County</h2>
+    <h2 style="color: #a50f15;">${featureData.countyName}</h2>
     <strong>Federal Disaster Declarations:</strong> ${featureData.disasters || 'N/A'}<br>
     <strong>FEMA Obligations (PA+HM):</strong> ${featureData.femaObligations ? `${parseFloat(featureData.femaObligations).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}` : 'N/A'}<br>
     <strong>County Population:</strong> ${featureData.countyPopulation ? parseInt(featureData.countyPopulation).toLocaleString('en-US') : 'N/A'}<br>
