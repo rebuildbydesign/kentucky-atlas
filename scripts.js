@@ -13,6 +13,28 @@ map.on('load', function () {
     handleMapClick();
 });
 
+const tooltip = document.getElementById('map-tooltip');
+
+map.on('mousemove', (e) => {
+    const features = map.queryRenderedFeatures(e.point, {
+        layers: ['femaDisasters'] // Only show tooltip on county layer
+    });
+
+    if (features.length > 0) {
+        map.getCanvas().style.cursor = 'pointer';
+        const countyName = features[0].properties.NAMELSAD;
+
+        tooltip.style.display = 'block';
+        tooltip.style.left = e.point.x + 15 + 'px';
+        tooltip.style.top = e.point.y + 15 + 'px';
+        tooltip.innerHTML = `Click to learn more about <br><strong>${countyName}</strong>`;
+    } else {
+        map.getCanvas().style.cursor = '';
+        tooltip.style.display = 'none';
+    }
+});
+
+
 function addLayers() {
     // FEMA Disaster Declarations by County Level
     map.addSource('kentuckyFema', {
