@@ -2,9 +2,10 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiajAwYnkiLCJhIjoiY2x1bHUzbXZnMGhuczJxcG83YXY4c
 
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/light-v11', // Use a Mapbox base style
-    center: [-85.7682, 37.8393], // Centered on Kentucky
-    zoom: 6.8
+    style: 'mapbox://styles/mapbox/light-v11',
+    center: [-85.7682, 37.8393],
+    zoom: 6.8,
+    minZoom: 6.8 // Prevents zooming out below initial view
 });
 
 map.on('load', function () {

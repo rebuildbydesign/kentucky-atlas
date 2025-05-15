@@ -29,3 +29,75 @@ body, html { margin: 0; padding: 0; height: 100%; }
 .mapboxgl-popup-tip {
     border-top-color: #fff; /* Ensures the tip arrow matches the popup background */
 }
+
+#title-container {
+    position: absolute;
+    top: 15px;
+    width: 100%;
+    text-align: center;
+    z-index: 10;
+}
+
+#title-container img {
+    max-width: 600px;
+    width: 80%;
+    height: auto;
+    pointer-events: none;
+}
+#legend {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: white;
+    border-radius: 6px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    z-index: 10;
+    width: 280px;
+}
+
+.legend-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.legend-gradient {
+    position: relative;
+    height: 24px;
+    background: linear-gradient(to right, 
+        #f0f0f0 0%, 
+        #fee5d9 14%, 
+        #fcae91 28%, 
+        #fb6a4a 43%, 
+        #de2d26 71%, 
+        #a50f15 100%);
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.legend-gradient span {
+    position: relative;
+    z-index: 1;
+}
+
+.legend-outline {
+    display: flex;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.legend-box {
+    width: 18px;
+    height: 14px;
+    border: 1px solid #000;
+    margin-right: 8px;
+}
