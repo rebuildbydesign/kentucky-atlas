@@ -183,7 +183,7 @@ function createPopupContent(featureData) {
     <strong>County Population:</strong> ${featureData.countyPopulation ? parseInt(featureData.countyPopulation).toLocaleString('en-US') : 'N/A'}<br>
     <strong>County Per Capita:</strong> ${featureData.countyPerCapita ? `${parseFloat(featureData.countyPerCapita).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}` : 'N/A'}<br>
     <strong>SVI Score:</strong> ${featureData.countySVI  || 'N/A'}
-    <h2 style="color: #a50f15;">Legislative Members</h2>
+    <h2 style="color: #a50f15;">Members of Congress</h2>
     <strong>Congress:</strong> ${featureData.congressRepName || 'N/A'} (${featureData.congressionalDist || 'N/A'})<br>
     <strong>House of Representative:</strong> ${featureData.houseRepName || 'N/A'} (${featureData.houseDist || 'N/A'})<br>
     <strong>Senate:</strong> ${featureData.senateRepName || 'N/A'} (${featureData.senateDist || 'N/A'})
