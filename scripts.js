@@ -15,6 +15,13 @@ map.on('load', function () {
 
 const tooltip = document.getElementById('map-tooltip');
 
+map.scrollZoom.disable();
+
+map.on('click', () => {
+    map.scrollZoom.enable();
+});
+
+
 map.on('mousemove', (e) => {
     const features = map.queryRenderedFeatures(e.point, {
         layers: ['femaDisasters'] // Only show tooltip on county layer
