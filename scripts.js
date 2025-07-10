@@ -8,6 +8,19 @@ var map = new mapboxgl.Map({
     minZoom: 6.8 // Prevents zooming out below initial view
 });
 
+
+// ---- Add Mapbox Geocoder ----
+var geocoder = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl,
+    marker: false, // No marker on result
+    placeholder: 'Search for an address',
+    flyTo: { zoom: 13 } // Or adjust as you prefer
+});
+// Add geocoder as a control (top-right, default UI)
+map.addControl(geocoder, 'top-right');
+
+
 map.on('load', function () {
     addLayers();
     handleMapClick();
@@ -19,26 +32,6 @@ map.scrollZoom.disable();
 
 map.on('click', () => {
     map.scrollZoom.enable();
-});
-
-
-map.on('mousemove', (e) => {
-    const features = map.queryRenderedFeatures(e.point, {
-        layers: ['femaDisasters'] // Only show tooltip on county layer
-    });
-
-    if (features.length > 0) {
-        map.getCanvas().style.cursor = 'pointer';
-        const countyName = features[0].properties.NAMELSAD;
-
-        tooltip.style.display = 'block';
-        tooltip.style.left = e.point.x + 15 + 'px';
-        tooltip.style.top = e.point.y + 15 + 'px';
-        tooltip.innerHTML = `Click to learn more about <br><strong>${countyName}</strong>`;
-    } else {
-        map.getCanvas().style.cursor = '';
-        tooltip.style.display = 'none';
-    }
 });
 
 
@@ -72,6 +65,7 @@ function addLayers() {
     addHouseLayers();
     addSenateLayers();
 }
+
 
 function addCongressionalLayers() {
     map.addSource('kyCongress', {
@@ -138,6 +132,7 @@ function handleMapClick() {
     });
 }
 
+
 function consolidateFeatureData(features) {
     var featureData = {
         countyName: '',
@@ -153,7 +148,7 @@ function consolidateFeatureData(features) {
         senateRepName: ''
     };
 
-    features.forEach(function(feature) {
+    features.forEach(function (feature) {
         switch (feature.layer.id) {
             case 'femaDisasters':
                 featureData.countyName = feature.properties.NAMELSAD;
@@ -181,26 +176,51 @@ function consolidateFeatureData(features) {
     return featureData;
 }
 
+
 function createPopupContent(featureData) {
     return `
-       <div style="color: #000;">
-    <h2 style="color: #a50f15;">${featureData.countyName}</h2>
-    <strong>Federal Disaster Declarations:</strong> ${featureData.disasters || 'N/A'}<br>
-    <strong>FEMA Obligations (PA+HM):</strong> ${featureData.femaObligations ? `${parseFloat(featureData.femaObligations).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}` : 'N/A'}<br>
-    <strong>County Population:</strong> ${featureData.countyPopulation ? parseInt(featureData.countyPopulation).toLocaleString('en-US') : 'N/A'}<br>
-    <strong>County Per Capita:</strong> ${featureData.countyPerCapita ? `${parseFloat(featureData.countyPerCapita).toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 })}` : 'N/A'}<br>
-    <strong>SVI Score:</strong> ${featureData.countySVI  || 'N/A'}
-    <h2 style="color: #a50f15;">Members of Congress</h2>
-    <strong>Congress:</strong> ${featureData.congressRepName || 'N/A'} (${featureData.congressionalDist || 'N/A'})<br>
-    <strong>House of Representative:</strong> ${featureData.houseRepName || 'N/A'} (${featureData.houseDist || 'N/A'})<br>
-    <strong>Senate:</strong> ${featureData.senateRepName || 'N/A'} (${featureData.senateDist || 'N/A'})
-    <p style="color: gray; font-style: italic; font-size: 0.9em;">* <a href="https://rebuildbydesign.org/atlas-of-accountability/" target="_blank" style="color: gray;">Atlas of Accountability (2011-2024) by Rebuild by Design</a></p>
-
-</div>
-
-
+      <div style="color:#222; font-family:inherit;">
+        <div style="
+            background: #f5e6e6; 
+            color: #444;
+            font-size: 0.98em;
+            font-weight: 600; 
+            padding: 7px 12px 7px 12px;
+            margin-bottom: 1em;
+            border-left: 5px solid #a50f15;
+        ">
+          Information for Selected Location
+        </div>
+        <div style="font-size:0.96em; color:#444; margin-bottom:0.9em;">
+          This summary shows federally declared disaster data and elected officials for the area you selected or searched.
+        </div>
+        <div style="margin-bottom:0.55em;">
+          <div style="font-size:1.18em; font-weight:bold; color:#a50f15; letter-spacing:0.02em;">${featureData.countyName || 'County'}</div>
+        </div>
+        <div style="margin-bottom:0.75em; line-height:1.55;">
+            <strong>Federal Disaster Declarations:</strong> ${featureData.disasters ?? 'N/A'}<br>
+            <strong>FEMA Obligations (PA+HM):</strong> ${featureData.femaObligations ? `${parseFloat(featureData.femaObligations).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}` : 'N/A'}<br>
+            <strong>County Population:</strong> ${featureData.countyPopulation ? parseInt(featureData.countyPopulation).toLocaleString('en-US') : 'N/A'}<br>
+            <strong>Per Capita FEMA Aid:</strong> ${featureData.countyPerCapita ? `${parseFloat(featureData.countyPerCapita).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}` : 'N/A'}<br>
+            <strong>SVI Score:</strong> ${featureData.countySVI ?? 'N/A'}
+        </div>
+        <div style="border-top:1px solid #ececec; margin:1em 0 1em 0;"></div>
+        <div style="font-size:1.18em; font-weight:bold; color:#a50f15; letter-spacing:0.02em;">
+          Elected Officials Covering This Location
+        </div>
+        <ul style="list-style:none; padding:0; margin:0 0 0.9em 0;">
+          <li style="margin-bottom: 3px;"><strong>U.S. Senate:</strong> Mitch McConnell (R), Rand Paul (R)</li>
+          <li style="margin-bottom: 3px;"><strong>U.S. House:</strong> ${featureData.congressRepName || 'N/A'} (${featureData.congressionalDist || 'N/A'})</li>
+          <li style="margin-bottom: 3px;"><strong>State Senate:</strong> ${featureData.senateRepName || 'N/A'} (${featureData.senateDist || 'N/A'})</li>
+          <li style="margin-bottom: 3px;"><strong>State House:</strong> ${featureData.houseRepName || 'N/A'} (${featureData.houseDist || 'N/A'})</li>
+        </ul>
+        <div style="color:gray; font-style:italic; font-size:0.85em;">
+          * <a href="https://rebuildbydesign.org/atlas-of-accountability/" target="_blank" style="color:gray;">Atlas of Accountability (2011–2024) by Rebuild by Design</a>
+        </div>
+      </div>
     `;
 }
+
 
 function showPopup(lngLat, content) {
     new mapboxgl.Popup()
@@ -208,3 +228,24 @@ function showPopup(lngLat, content) {
         .setHTML(content)
         .addTo(map);
 }
+
+
+map.on('mousemove', (e) => {
+    const features = map.queryRenderedFeatures(e.point, {
+        layers: ['femaDisasters'] // Only show tooltip on county layer
+    });
+
+    if (features.length > 0) {
+        map.getCanvas().style.cursor = 'pointer';
+        const countyName = features[0].properties.NAMELSAD;
+
+        tooltip.style.display = 'block';
+        tooltip.style.left = e.point.x + 15 + 'px';
+        tooltip.style.top = e.point.y + 15 + 'px';
+        tooltip.innerHTML = `Click to learn more about <br><strong>${countyName}</strong>`;
+    } else {
+        map.getCanvas().style.cursor = '';
+        tooltip.style.display = 'none';
+    }
+});
+

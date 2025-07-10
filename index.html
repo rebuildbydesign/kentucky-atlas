@@ -1,12 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kentucky Interactive Map</title>
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet">
+    <!-- MAPBOX GL JS v3.3.0 -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+
+    <!-- MAPBOX GEOCODER v5.0.0 -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
+        rel="stylesheet">
+    <script
+        src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+
+    <!-- CUSTOM BLACK GEOCODER STYLE -->
+    <link rel="stylesheet" href="geocoder.css" type="text/css" />
+
+    <!-- CUSTOM GOOGLE FONT (Poppins, AOA style) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
+        rel="stylesheet">
+
+    <!-- FONT AWESOME ICONS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
+    <!-- YOUR MAIN STYLESHEET -->
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div id="title-container">
         <img src="data/kentucky-title.png" alt="Atlas of Accountability Title" />
@@ -14,25 +39,25 @@
     <div id="map"></div>
     <div id="map-tooltip" style="display: none;"></div>
 
-   <div id="legend">
-    <div class="legend-title"># of Major Disaster Declarations</div>
-    <div class="legend-gradient">
-        <span>0</span>
-        <span>2</span>
-        <span>4</span>
-        <span>6</span>
-        <span>8</span>
-        <span>10</span>
-        <span>12+</span>
+    <div id="legend">
+        <div class="legend-title"># of Major Disaster Declarations</div>
+        <div class="legend-gradient">
+            <span>0</span>
+            <span>2</span>
+            <span>4</span>
+            <span>6</span>
+            <span>8</span>
+            <span>10</span>
+            <span>12+</span>
+        </div>
+        <div class="legend-outline">
+            <div class="legend-box"></div>
+            <span>County Boundaries</span>
+        </div>
     </div>
-    <div class="legend-outline">
-        <div class="legend-box"></div>
-        <span>County Boundaries</span>
-    </div>
-</div>
 
-
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+    <!-- JS scripts -->
     <script src="scripts.js"></script>
 </body>
+
 </html>

@@ -14,13 +14,15 @@ body, html { margin: 0; padding: 0; height: 100%; }
 }
 
 .mapboxgl-popup-content {
-    color: #000; /* Black text color for the content */
-    background-color: #fff; /* White background for the popup */
-    border-color: #a50f15; /* Accent color for the border */
+    color: #000;
+    background-color: #fff;
+    border-color: #a50f15;
     border-width: 2px;
     padding: 10px;
-    border-radius: 5px; /* Optional: Adds rounded corners to the popup */
+    border-radius: 5px;
+    width: 380px !important;  /* This will override Mapbox's inline style */
 }
+
 
 .mapboxgl-popup-close-button {
     color: #a50f15; /* Accent color for the close button */
