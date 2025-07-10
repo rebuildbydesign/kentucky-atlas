@@ -13,12 +13,42 @@ var map = new mapboxgl.Map({
 var geocoder = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
     mapboxgl: mapboxgl,
-    marker: false, // No marker on result
+    marker: false,
     placeholder: 'Search for an address',
-    flyTo: { zoom: 13 } // Or adjust as you prefer
+    flyTo: {
+    zoom: 9,
+    speed: 1.2, // (optional) make it slower/faster
+    curve: 1    // (optional) more/less dramatic arc
+}
 });
-// Add geocoder as a control (top-right, default UI)
-map.addControl(geocoder, 'top-right');
+document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+
+
+// ---- Geocoder Popup ------
+geocoder.on('result', function(e) {
+    // Get the [lng, lat] center of the selected result
+    var lngLat = e.result.center;
+
+    // Query the features at that point, just like your map click
+    var point = map.project(lngLat);
+
+    // Adjust buffer/box if you want a larger hit area, but start with a single pixel:
+    var features = map.queryRenderedFeatures(point, {
+        layers: ['femaDisasters', 'congressionalDistricts', 'houseDistricts', 'senateDistricts']
+    });
+
+    if (features.length > 0) {
+        var featureData = consolidateFeatureData(features);
+        var popupContent = createPopupContent(featureData);
+        showPopup(lngLat, popupContent);
+    } else {
+        // Optional: show a generic popup if not on a feature
+        showPopup(lngLat, "<div style='color:#222'>No county or district data at this location.</div>");
+    }
+});
+
+
+
 
 
 map.on('load', function () {
@@ -229,7 +259,7 @@ function showPopup(lngLat, content) {
         .addTo(map);
 }
 
-
+//
 map.on('mousemove', (e) => {
     const features = map.queryRenderedFeatures(e.point, {
         layers: ['femaDisasters'] // Only show tooltip on county layer
@@ -242,7 +272,7 @@ map.on('mousemove', (e) => {
         tooltip.style.display = 'block';
         tooltip.style.left = e.point.x + 15 + 'px';
         tooltip.style.top = e.point.y + 15 + 'px';
-        tooltip.innerHTML = `Click to learn more about <br><strong>${countyName}</strong>`;
+        tooltip.innerHTML = `Click to learn more<br><strong>${countyName}</strong>`;
     } else {
         map.getCanvas().style.cursor = '';
         tooltip.style.display = 'none';

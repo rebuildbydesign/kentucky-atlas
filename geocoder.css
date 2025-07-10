@@ -9,9 +9,9 @@
 .mapboxgl-ctrl-geocoder {
     position: absolute;
     left: auto; /* Reset left to auto */
-    background-color:  rgba(255, 255, 255, 0.75); /* Background */
+    background-color:  rgba(0, 0, 0, 0.75); /* Background */
     width: 225px;
-    color: #000; /* Text color */
+    color: #fff; /* Text color */
     min-width: 225px;
     z-index: 999;
     transition: width .25s, min-width .25s;
@@ -35,7 +35,7 @@
     background-color: transparent;
     margin: 0;
     height: 40px;
-    color: #000; /* White text */
+    color: #fff; /* White text */
     font-weight: bold; /* Bold text */
     padding: 10px;
     font-size: 16px;
@@ -51,13 +51,13 @@
 }
 
 .mapboxgl-ctrl-geocoder--input:focus {
-    color: #000; /* White text */
+    color: #fff; /* White text */
     outline: thin dotted;
 }
 
 /* Set placeholder text color to white and font family to Arial */
 .mapboxgl-ctrl-geocoder--input::placeholder {
-    color: #000; /* White text */
+    color: #fff; /* White text */
     opacity: 1; /* Ensures the color is not faded */
     font-family: 'Arial'; /* Font family */
 }
