@@ -1,19 +1,24 @@
-mapboxgl.accessToken = 'pk.eyJ1IjoiajAwYnkiLCJhIjoiY2x1bHUzbXZnMGhuczJxcG83YXY4czJ3ayJ9.S5PZpU9VDwLMjoX_0x5FDQ'; // Your Mapbox access token 
+mapboxgl.accessToken = 'pk.eyJ1IjoiajAwYnkiLCJhIjoiY2x1bHUzbXZnMGhuczJxcG83YXY4czJ3ayJ9.S5PZpU9VDwLMjoX_0x5FDQ';
 
+// HOLDS THE CURRENTLY OPEN POPUP
+var currentPopup = null;
+
+
+// INITIALIZE MAP
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11',
-    center: [-85.7682, 37.8393],
+    center: [-85.7682, 37.8393], // CENTERED ON KENTUCKY
     zoom: 6.8,
-    minZoom: 5.8 // Prevents zooming out below initial view
+    minZoom: 5.8
 });
 
-// --- Responsive initial zoom for mobile ---
+// RESPONSIVE INITIAL ZOOM FOR MOBILE
 if (window.innerWidth <= 700) {
     map.setZoom(5.8);
 }
 
-// ---- Add Mapbox Geocoder ----
+// ADD MAPBOX GEOCODER (ADDRESS SEARCH)
 var geocoder = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
     mapboxgl: mapboxgl,
@@ -27,8 +32,8 @@ var geocoder = new MapboxGeocoder({
 });
 document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-// ---- Geocoder Popup ------
-geocoder.on('result', function(e) {
+// HANDLE GEOCODER SEARCH RESULTS (POPUP LOGIC)
+geocoder.on('result', function (e) {
     var lngLat = e.result.center;
     var point = map.project(lngLat);
 
@@ -42,13 +47,14 @@ geocoder.on('result', function(e) {
 
         var femaFeature = features.find(f => f.layer && f.layer.id === 'femaDisasters');
         if (femaFeature && typeof turf !== 'undefined') {
+            // USE CENTROID FOR FEMA DISASTER FEATURE
             var geojsonFeature = {
                 "type": "Feature",
                 "geometry": femaFeature.geometry,
                 "properties": femaFeature.properties
             };
             var centroid = turf.centroid(geojsonFeature).geometry.coordinates;
-            showPopup({lng: centroid[0], lat: centroid[1]}, popupContent);
+            showPopup({ lng: centroid[0], lat: centroid[1] }, popupContent);
         } else {
             showPopup(lngLat, popupContent);
         }
@@ -57,13 +63,12 @@ geocoder.on('result', function(e) {
     }
 });
 
-// --- MAP LOADS ----
-
+// LOAD MAP AND LAYERS, SETUP TOOLTIP INTERACTION
 map.on('load', function () {
     addLayers();
     handleMapClick();
 
-    // ---- CLICK TO LEARN MORE --- Tooltip logic (only after layers loaded!) ----
+    // TOOLTIP FOR HOVERING OVER COUNTY
     map.on('mousemove', (e) => {
         const features = map.queryRenderedFeatures(e.point, {
             layers: ['femaDisasters']
@@ -86,12 +91,13 @@ map.on('load', function () {
 
 const tooltip = document.getElementById('map-tooltip');
 
+// DISABLE SCROLL ZOOM INITIALLY TO PREVENT ACCIDENTAL ZOOMING
 map.scrollZoom.disable();
-
 map.on('click', () => {
     map.scrollZoom.enable();
 });
 
+// ADD ALL MAP LAYERS (FEMA, CONGRESS, HOUSE, SENATE)
 function addLayers() {
     map.addSource('kentuckyFema', {
         type: 'geojson',
@@ -122,6 +128,7 @@ function addLayers() {
     addSenateLayers();
 }
 
+// ADD CONGRESSIONAL DISTRICT POLYGONS
 function addCongressionalLayers() {
     map.addSource('kyCongress', {
         type: 'geojson',
@@ -139,6 +146,7 @@ function addCongressionalLayers() {
     });
 }
 
+// ADD STATE HOUSE DISTRICT POLYGONS
 function addHouseLayers() {
     map.addSource('kyHouse', {
         type: 'geojson',
@@ -156,6 +164,7 @@ function addHouseLayers() {
     });
 }
 
+// ADD STATE SENATE DISTRICT POLYGONS
 function addSenateLayers() {
     map.addSource('kySenate', {
         type: 'geojson',
@@ -173,7 +182,7 @@ function addSenateLayers() {
     });
 }
 
-// --- HANDLE MOUSE CLICK POPUP INFO ---
+// HANDLE MAP CLICK POPUP (COUNTY + DISTRICT DETAILS)
 function handleMapClick() {
     map.on('click', function (e) {
         var features = map.queryRenderedFeatures(e.point, {
@@ -185,26 +194,26 @@ function handleMapClick() {
             var popupContent = createPopupContent(featureData);
 
             var femaFeature = features.find(f => f.layer && f.layer.id === 'femaDisasters');
-            var isMobile = window.innerWidth <= 700; // you can tweak the width!
+            var isMobile = window.innerWidth <= 700;
 
             if (femaFeature && typeof turf !== 'undefined' && !isMobile) {
-                // Desktop: show at centroid
+                // DESKTOP: SHOW POPUP AT COUNTY CENTROID
                 var geojsonFeature = {
                     "type": "Feature",
                     "geometry": femaFeature.geometry,
                     "properties": femaFeature.properties
                 };
                 var centroid = turf.centroid(geojsonFeature).geometry.coordinates;
-                showPopup({lng: centroid[0], lat: centroid[1]}, popupContent);
+                showPopup({ lng: centroid[0], lat: centroid[1] }, popupContent);
             } else {
-                // Mobile: show at tap/click
+                // MOBILE: SHOW POPUP AT CLICK LOCATION
                 showPopup(e.lngLat, popupContent);
             }
         }
     });
 }
 
-
+// CONSOLIDATE ALL FEATURE DATA FROM CLICK OR SEARCH
 function consolidateFeatureData(features) {
     var featureData = {
         countyName: '',
@@ -248,6 +257,7 @@ function consolidateFeatureData(features) {
     return featureData;
 }
 
+// CREATE HTML FOR POPUP PANEL
 function createPopupContent(featureData) {
     return `
       <div style="color:#222; font-family:inherit;">
@@ -286,15 +296,22 @@ function createPopupContent(featureData) {
           <li style="margin-bottom: 3px;"><strong>State House:</strong> ${featureData.houseRepName || 'N/A'} (${featureData.houseDist || 'N/A'})</li>
         </ul>
         <div style="color:gray; font-style:italic; font-size:0.85em;">
-          * <a href="https://rebuildbydesign.org/atlas-of-accountability/" target="_blank" style="color:gray;">Atlas of Accountability (2011–2024) by Rebuild by Design</a>
+          * <a href="https://rebuildbydesign.org/atlas-of-disaster" target="_blank" style="color:gray;">Atlas of Disaster (2011–2024) by Rebuild by Design</a>
         </div>
       </div>
     `;
 }
 
+// SHOW MAPBOX POPUP WITH PROVIDED CONTENT
 function showPopup(lngLat, content) {
-    new mapboxgl.Popup()
+    // CLOSE EXISTING POPUP IF IT EXISTS
+    if (currentPopup) {
+        currentPopup.remove();
+    }
+    // CREATE AND SHOW NEW POPUP, SAVE TO GLOBAL
+    currentPopup = new mapboxgl.Popup()
         .setLngLat(lngLat)
         .setHTML(content)
         .addTo(map);
 }
+
