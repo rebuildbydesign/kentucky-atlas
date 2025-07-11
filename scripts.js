@@ -5,9 +5,13 @@ var map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/light-v11',
     center: [-85.7682, 37.8393],
     zoom: 6.8,
-    minZoom: 6.8 // Prevents zooming out below initial view
+    minZoom: 5.8 // Prevents zooming out below initial view
 });
 
+// --- Responsive initial zoom for mobile ---
+if (window.innerWidth <= 700) {
+    map.setZoom(5.8);
+}
 
 // ---- Add Mapbox Geocoder ----
 var geocoder = new MapboxGeocoder({
@@ -16,23 +20,18 @@ var geocoder = new MapboxGeocoder({
     marker: false,
     placeholder: 'Search for an address',
     flyTo: {
-    zoom: 9,
-    speed: 1.2, // (optional) make it slower/faster
-    curve: 1    // (optional) more/less dramatic arc
-}
+        zoom: 9,
+        speed: 1.2,
+        curve: 1
+    }
 });
 document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
 
-
 // ---- Geocoder Popup ------
 geocoder.on('result', function(e) {
-    // Get the [lng, lat] center of the selected result
     var lngLat = e.result.center;
-
-    // Query the features at that point, just like your map click
     var point = map.project(lngLat);
 
-    // Adjust buffer/box if you want a larger hit area, but start with a single pixel:
     var features = map.queryRenderedFeatures(point, {
         layers: ['femaDisasters', 'congressionalDistricts', 'houseDistricts', 'senateDistricts']
     });
@@ -40,20 +39,49 @@ geocoder.on('result', function(e) {
     if (features.length > 0) {
         var featureData = consolidateFeatureData(features);
         var popupContent = createPopupContent(featureData);
-        showPopup(lngLat, popupContent);
+
+        var femaFeature = features.find(f => f.layer && f.layer.id === 'femaDisasters');
+        if (femaFeature && typeof turf !== 'undefined') {
+            var geojsonFeature = {
+                "type": "Feature",
+                "geometry": femaFeature.geometry,
+                "properties": femaFeature.properties
+            };
+            var centroid = turf.centroid(geojsonFeature).geometry.coordinates;
+            showPopup({lng: centroid[0], lat: centroid[1]}, popupContent);
+        } else {
+            showPopup(lngLat, popupContent);
+        }
     } else {
-        // Optional: show a generic popup if not on a feature
         showPopup(lngLat, "<div style='color:#222'>No county or district data at this location.</div>");
     }
 });
 
-
-
-
+// --- MAP LOADS ----
 
 map.on('load', function () {
     addLayers();
     handleMapClick();
+
+    // ---- CLICK TO LEARN MORE --- Tooltip logic (only after layers loaded!) ----
+    map.on('mousemove', (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+            layers: ['femaDisasters']
+        });
+
+        if (features.length > 0) {
+            map.getCanvas().style.cursor = 'pointer';
+            const countyName = features[0].properties.NAMELSAD;
+
+            tooltip.style.display = 'block';
+            tooltip.style.left = e.point.x + 15 + 'px';
+            tooltip.style.top = e.point.y + 15 + 'px';
+            tooltip.innerHTML = `Click to learn more<br><strong>${countyName}</strong>`;
+        } else {
+            map.getCanvas().style.cursor = '';
+            tooltip.style.display = 'none';
+        }
+    });
 });
 
 const tooltip = document.getElementById('map-tooltip');
@@ -64,9 +92,7 @@ map.on('click', () => {
     map.scrollZoom.enable();
 });
 
-
 function addLayers() {
-    // FEMA Disaster Declarations by County Level
     map.addSource('kentuckyFema', {
         type: 'geojson',
         data: 'data/KY_FEMA_County.json'
@@ -95,7 +121,6 @@ function addLayers() {
     addHouseLayers();
     addSenateLayers();
 }
-
 
 function addCongressionalLayers() {
     map.addSource('kyCongress', {
@@ -148,6 +173,7 @@ function addSenateLayers() {
     });
 }
 
+// --- HANDLE MOUSE CLICK POPUP INFO ---
 function handleMapClick() {
     map.on('click', function (e) {
         var features = map.queryRenderedFeatures(e.point, {
@@ -157,7 +183,23 @@ function handleMapClick() {
         if (features.length > 0) {
             var featureData = consolidateFeatureData(features);
             var popupContent = createPopupContent(featureData);
-            showPopup(e.lngLat, popupContent);
+
+            var femaFeature = features.find(f => f.layer && f.layer.id === 'femaDisasters');
+            var isMobile = window.innerWidth <= 700; // you can tweak the width!
+
+            if (femaFeature && typeof turf !== 'undefined' && !isMobile) {
+                // Desktop: show at centroid
+                var geojsonFeature = {
+                    "type": "Feature",
+                    "geometry": femaFeature.geometry,
+                    "properties": femaFeature.properties
+                };
+                var centroid = turf.centroid(geojsonFeature).geometry.coordinates;
+                showPopup({lng: centroid[0], lat: centroid[1]}, popupContent);
+            } else {
+                // Mobile: show at tap/click
+                showPopup(e.lngLat, popupContent);
+            }
         }
     });
 }
@@ -206,7 +248,6 @@ function consolidateFeatureData(features) {
     return featureData;
 }
 
-
 function createPopupContent(featureData) {
     return `
       <div style="color:#222; font-family:inherit;">
@@ -251,31 +292,9 @@ function createPopupContent(featureData) {
     `;
 }
 
-
 function showPopup(lngLat, content) {
     new mapboxgl.Popup()
         .setLngLat(lngLat)
         .setHTML(content)
         .addTo(map);
 }
-
-//
-map.on('mousemove', (e) => {
-    const features = map.queryRenderedFeatures(e.point, {
-        layers: ['femaDisasters'] // Only show tooltip on county layer
-    });
-
-    if (features.length > 0) {
-        map.getCanvas().style.cursor = 'pointer';
-        const countyName = features[0].properties.NAMELSAD;
-
-        tooltip.style.display = 'block';
-        tooltip.style.left = e.point.x + 15 + 'px';
-        tooltip.style.top = e.point.y + 15 + 'px';
-        tooltip.innerHTML = `Click to learn more<br><strong>${countyName}</strong>`;
-    } else {
-        map.getCanvas().style.cursor = '';
-        tooltip.style.display = 'none';
-    }
-});
-
