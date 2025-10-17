@@ -172,7 +172,7 @@ function addCongressionalLayers() {
         source: 'kyCongress',
         layout: {
           'visibility': 'none',
-          'text-field': ['get', 'CD118FP'],
+          'text-field': ['get', 'OFFICE_ID'],
           'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
           'text-size': 20
         },
